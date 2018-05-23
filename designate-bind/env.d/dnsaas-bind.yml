@@ -1,0 +1,20 @@
+---
+component_skel:
+  dnsaas-bind:
+    belongs_to:
+      - dnsaas-bind_all
+
+container_skel:
+  dnsaas-bind_container:
+    belongs_to:
+      - dnsaas-bind_containers
+    contains:
+      - dnsaas-bind
+
+physical_skel:
+  dnsaas-bind_containers:
+    belongs_to:
+      - all_containers
+  dnsaas-bind_hosts:
+    belongs_to:
+      - hosts

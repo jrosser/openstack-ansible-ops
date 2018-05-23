@@ -1,0 +1,12 @@
+# Start of rndc.conf
+key "rndc-key" {
+        algorithm hmac-md5;
+        "{{ dnsaas_bind_rndc_secret }}";
+};
+
+options {
+        default-key "rndc-key";
+        default-server {{ dnsaas_bind_rndc_default_server }};
+        default-port {{ dnsaas_bind_rndc_default_port }};
+};
+# End of rndc.conf

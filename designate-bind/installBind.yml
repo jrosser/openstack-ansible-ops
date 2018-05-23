@@ -1,0 +1,30 @@
+---
+- name: Install bind
+  hosts: dnsaas-bind
+  become: true
+
+  vars:
+    dnsaas_bind_rndc_secret: 'DTngw5O8I5Axx631GjQ9pA=='
+    dnsaas_bind_rndc_default_port: 953
+    dnsaas_bind_rndc_listen_cidr: 10.11.128.0/24
+ 
+    named_config:
+      include: '"/etc/rndc.key"'
+      controls:
+        - "inet {{ container_address }} port {{ dnsaas_bind_rndc_default_port }} allow { 127.0.0.1; {{ dnsaas_bind_rndc_listen_cidr  }}; } keys {\"rndc-key\"; }"
+ 
+    named_options:
+      allow-new-zones: 'yes'
+      minimal-responses: 'yes'
+
+  tasks:
+    - name: Copy rndc key
+      template:
+        src: rndc.key.j2
+        dest: /etc/rndc.key
+        owner: bind
+        group: bind
+        mode: '0600'
+
+  roles:
+    - rd-ansible-dns-install

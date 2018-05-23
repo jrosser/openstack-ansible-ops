@@ -1,0 +1,45 @@
+    # define a number of public interface IP which live outside of the
+    # dynamic inventory. This is necessary as we must know and fix these
+    # IP as they must be referenced outside our deployment
+    # put as many entries in this list as dnsaas_bind hosts, index in host group
+    # will select which is used per host.
+    dnsaas_bind_public_interfaces:
+       - infrastructure_address: {
+             "address": "172.29.64.17", 
+             "bridge": "br-external", 
+             "interface": "eth20", 
+             "netmask": "255.255.255.224", 
+             "static_routes": [
+                 {
+                     "cidr": "172.29.65.0/24", 
+                     "gateway": "172.29.64.5"
+                 }
+             ], 
+             "type": "veth"
+          }
+       - infrastructure_address: {
+              "address": "172.29.64.18", 
+              "bridge": "br-external", 
+              "interface": "eth20", 
+              "netmask": "255.255.255.224", 
+              "static_routes": [
+                  {
+                      "cidr": "172.29.65.0/24", 
+                      "gateway": "172.29.64.5"
+                  }
+              ], 
+              "type": "veth"
+          }
+
+    # find the index for this host in the host group
+    dnsaas_bind_host_group_index: "{{ groups['dnsaas-bind'].index(inventory_hostname) }}"
+
+    # we will clobber the existing default interface unless we preserve it
+    dnsaas_bind_lxc_container_networks_default:
+      lxcbr0_address:
+        bridge: lxcbr0
+        interface: eth0
+        type: veth
+
+    # combine the default interface with the specific external interface for this host
+    lxc_container_networks: "{{ dnsaas_bind_lxc_container_networks_default | combine(dnsaas_bind_public_interfaces[dnsaas_bind_host_group_index | int]) }}"

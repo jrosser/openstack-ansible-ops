@@ -1,0 +1,34 @@
+- name: "default"
+  description: Default BIND9 Pool
+  attributes: {}
+
+  ns_records:
+    - hostname: ns0.example.org.
+      priority: 1    
+  
+  # the dns servers which are contacted to verify that records have been published
+  nameservers:
+{% for host in groups['dnsaas-bind'] %}
+    - host: {{ hostvars[host].container_address }}
+      port: 53
+{% endfor %}
+
+  # the target nameservers in this pool
+  targets:
+{% for target in groups['dnsaas-bind'] %}
+    - type: bind9
+      description: BIND9 Server
+      # list of designate-mdns servers from which bind requests zone transfers
+      masters:
+{% for master in groups['designate_mdns'] %}
+        - host: {{ hostvars[master].container_address }}
+          port: 5354
+{% endfor %}
+      options:
+        host: {{ hostvars[target].container_address }}
+        port: 53
+        rndc_host: {{ hostvars[target].container_address }}
+        rndc_port: 953
+        rndc_key_file: /etc/designate/rndc.key
+
+{% endfor %}

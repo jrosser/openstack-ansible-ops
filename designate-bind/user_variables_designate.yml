@@ -1,0 +1,1 @@
+designate_pools_yaml: "{{ lookup('template', '/etc/openstack_deploy/designate_pools.j2') | from_yaml }}"
