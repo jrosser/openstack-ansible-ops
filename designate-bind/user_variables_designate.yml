@@ -1,1 +1,5 @@
 designate_pools_yaml: "{{ lookup('template', '/etc/openstack_deploy/designate_pools.j2') | from_yaml }}"
+
+dnsaas_bind_rndc_secret: 'DTngw5O8I5Axx631GjQ9pA=='
+dnsaas_bind_rndc_default_port: 953
+dnsaas_bind_rndc_listen_cidr: 10.11.128.0/24

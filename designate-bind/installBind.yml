@@ -4,10 +4,7 @@
   become: true
 
   vars:
-    dnsaas_bind_rndc_secret: 'DTngw5O8I5Axx631GjQ9pA=='
-    dnsaas_bind_rndc_default_port: 953
-    dnsaas_bind_rndc_listen_cidr: 10.11.128.0/24
- 
+
     named_config:
       include: '"/etc/rndc.key"'
       controls:
@@ -16,6 +13,7 @@
     named_options:
       allow-new-zones: 'yes'
       minimal-responses: 'yes'
+      masterfile-format: 'text'
 
   tasks:
     - name: Copy rndc key
@@ -28,3 +26,20 @@
 
   roles:
     - rd-ansible-dns-install
+
+
+
+- name: Fix up designate configuration
+  hosts: designate_all
+  become: true
+
+  tasks:
+    - name: Ensure rndc tool is present
+      package:
+        name: bind9utils
+        state: present
+
+    - name: Create rndc key
+      template:
+        src: rndc.key.j2
+        dest: /etc/designate/rndc.key
